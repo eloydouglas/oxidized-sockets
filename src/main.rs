@@ -9,19 +9,20 @@ fn main() {
 
     if args.len() == 1 {
         println!("\nExpected arguments but found none! Type --help to get the list of commands");
-        return
     }
 
-    let server = &args[1] == "server";
-
-    for arg in &args {
-        if arg == "--help" {
-            println!("\nserver - starts the server listening at port 7878");
-            println!("\nclient - starts the server connecting to localhost at port 7878");
-            return
+    if args.len() == 2 {
+        for arg in &args {
+            if arg == "--help" {
+                println!("\nserver - starts the server listening at port 7878");
+                println!("\nclient - starts the server connecting to localhost at port 7878");
+                return
+            }
         }
     }
 
+    let server = &args[1] == "server";
+    
     if server {
         let mut root: Option<String> = None;
         let mut port: Option<i16> = None;
