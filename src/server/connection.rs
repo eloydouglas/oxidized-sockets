@@ -4,7 +4,7 @@ use crate::{
     server::commands::{
         ChangeDir, Help, ListDir, MakeDir, RemovePath
     },
-    utils::{handle_file, parse_messages, send_message}
+    utils::{handle_file, parse_messages, send_file, send_message}
 };
 
 pub fn start(root_dir: Option<String>, port: Option<i16>) {
@@ -80,7 +80,13 @@ fn handle_connection(mut stream: TcpStream, root_dir: &String) {
                         let parts: Vec<&str> = command.split_whitespace().collect();
                         if let Some(filename) = parts.get(1) {
                             handle_file(&mut stream, &curr_dir, filename.to_string());
-                            send_message(&stream, "File uploaded successfully");
+                        }
+                    },
+                    command if command.starts_with("download") => {
+                        let parts: Vec<&str> = command.split_whitespace().collect();
+                        if let Some(filename) = parts.get(1) {
+                            send_message(&stream, &("::UPLOAD::".to_owned() + filename.to_owned()));
+                            send_file(&mut stream, String::from(curr_dir.clone() + "/" + filename));
                         }
                     },
                     "help" => {
@@ -99,6 +105,7 @@ fn handle_connection(mut stream: TcpStream, root_dir: &String) {
                             send_message(&stream, &message);
                         }
                     },
+                    "" => (),
                     _  => {
                         send_message(&stream, "::DISPLAY::Invalid command!");
                         let messages_list = Help::call();
