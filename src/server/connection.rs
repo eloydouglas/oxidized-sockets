@@ -1,4 +1,4 @@
-use std::{io::Read, net::{TcpListener, TcpStream}};
+use std::{io::Read, net::{TcpListener, TcpStream}, thread};
 
 use crate::{
     server::commands::{
@@ -17,11 +17,14 @@ pub fn start(root_dir: Option<String>, port: Option<i16>) {
     println!("Server listenning to connections in port {port}");
     
     for stream in listener.incoming() {
-        handle_connection(stream.unwrap(), &root_dir);
+        let root_dir = root_dir.clone();
+        thread::spawn(move || {
+            handle_connection(stream.unwrap(), root_dir);
+        });
     }
 }
 
-fn handle_connection(mut stream: TcpStream, root_dir: &String) {
+fn handle_connection(mut stream: TcpStream, root_dir: String) {
     let mut buffer = [0; 512];
 
     println!("Connection received");
