@@ -28,6 +28,11 @@ impl ChangeDir {
 
             if let Ok(resolved) = path.canonicalize() {
                 let root = Path::new("./").canonicalize().unwrap();
+
+                if !resolved.is_dir() {
+                    return curr_path.clone();
+                }
+
                 if !resolved.starts_with(root) {
                     return curr_path.clone();
                 }
